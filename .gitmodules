@@ -1,3 +1,0 @@
-[submodule "mpich"]
-	path = mpich
-	url = git://git.mpich.org/mpich.git
