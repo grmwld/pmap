@@ -127,9 +127,10 @@ int main (int argc, char *argv[]) {
                 exit(-1);
             }
         }        
+        if (nline_per_read == -1) {
+            nline_per_read = get_nline_per_read(readsfile);
+        }
     }
-    if (nline_per_read == -1) 
-        nline_per_read = get_nline_per_read(readsfile);        
 
     // Memory allocation
     ofname = (char **) malloc(sizeof(char *) * nProc);    
