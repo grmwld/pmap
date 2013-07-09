@@ -144,9 +144,9 @@ int main (int argc, char *argv[]) {
     ncmd = 0;
     if (program == BOWTIE) {
         if (paired_end)   
-            sprintf(cmd[ncmd++], "bowtie %s %s -1 %s/pmap.reads -2 %s/pmap.reads2 %s/pmapoutfile.out.txt", progargs, indexprefix, workdir, workdir, workdir);
+            sprintf(cmd[ncmd++], "bowtie %s %s/%s -1 %s/pmap.reads -2 %s/pmap.reads2 %s/pmapoutfile.out.txt", progargs, indexdir, indexprefix, workdir, workdir, workdir);
         else              
-            sprintf(cmd[ncmd++], "bowtie %s %s %s/pmap.reads %s/pmapoutfile.out.txt", progargs, indexprefix, workdir, workdir);                
+            sprintf(cmd[ncmd++], "bowtie %s %s/%s %s/pmap.reads %s/pmapoutfile.out.txt", progargs, indexdir, indexprefix, workdir, workdir);                
     } else if (program == BWA) {
         if (paired_end) { 
             sprintf(cmd[ncmd++], "bwa aln %s %s/%s %s/pmap.reads > %s/pmap.out.sai", progargs, indexdir, indexprefix, workdir, workdir);
