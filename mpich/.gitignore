@@ -1,0 +1,8 @@
+*.a
+*.la
+*.o
+*.Po
+*.lo
+*.Plo
+*Makefile
+*.dirstamp
