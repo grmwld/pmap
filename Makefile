@@ -6,6 +6,9 @@ TARGET = pmap_dist pmap pmap_index
 
 all : $(TARGET)
 
+install:
+	cp ${TARGET} /usr/local/bin
+
 clean: 
 	-rm -f *.o
 	-rm -f $(TARGET)
@@ -20,4 +23,3 @@ pmap: pmap.c mpi_util.c Makefile
 
 pmap_index: pmap_index.c Makefile
 	$(CC) $(CFLAGS) pmap_index.c -o pmap_index -lz
-
