@@ -82,7 +82,7 @@ int main (int argc, char *argv[]) {
     mainworkdir = argv[i++];
     sprintf(workdir, "%s/pmap_node%d", mainworkdir, myProc);
     if (!folder_exists(workdir)) {
-        fprintf(stderr, "[Node %d] pmap error: Cannot find local workdir\n", myProc);
+        fprintf(stderr, "[Node %d] pmap error: Cannot find local workdir: %s\n", myProc, workdir);
         exit(-1);
     }    
     if (!strcmp(indexdir, "")) {
@@ -234,7 +234,7 @@ int main (int argc, char *argv[]) {
     }
 
     /* Remove all temporary files */
-    if (cleanup) { 
+    if (cleanup) {
         sprintf(cmd[0], "/bin/rm -rf %s/*; /bin/rmdir %s", workdir, workdir);        
         system(cmd[0]);
         if (myProc == 0) {
@@ -281,12 +281,4 @@ int main (int argc, char *argv[]) {
     
     return 0;
 }
-
-
-
-
-
-
-
-
 
