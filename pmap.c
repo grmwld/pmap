@@ -42,7 +42,7 @@ int main (int argc, char *argv[]) {
     int i, ncmd;
     char progargs[1000], workdir[1000], outfile[50]="pmapoutfile.out.txt", *mainworkdir, *outdir, indexprefix[1000]="index", indexdir[1000]="", convargs[1000];
     char cmd[10][1000], usage[1000], fname[1000];
-    int cleanup=1, paired_end=0, shared_index=0;
+    int cleanup=1, paired_end=0, shared_index=0, dry=0;
     FILE *pfp, *fp;
     int program;
     MPI_Comm comm=MPI_COMM_WORLD;
@@ -54,7 +54,7 @@ int main (int argc, char *argv[]) {
 
     /*#############################################*/
     /*### PARSE INPUT PARAMETERS ##################*/
-    sprintf(usage, "Usage: %s [-pe] [-dc] [-i <indexdir> <indexprefix>] <workdir> <outdir> <program> [programpars] [-conversion <convpars>]\n", argv[0]);
+    sprintf(usage, "Usage: %s [-pe] [-dc] [-dry] [-i <indexdir> <indexprefix>] <workdir> <outdir> <program> [programpars] [-conversion <convpars>]\n", argv[0]);
     
     MPI_Init(&argc, &argv);
     MPI_Comm_size(comm, &nProc);
@@ -67,6 +67,8 @@ int main (int argc, char *argv[]) {
     for (i=1; ; i++) {
         if (!strcmp(argv[i], "-dc")) 
             cleanup = 0;
+        else if (!strcmp(argv[i], "-dry"))
+            dry = 1;
         else if (!strcmp(argv[i], "-pe")) 
             paired_end = 1;
         else if (!strcmp(argv[i], "-i")) {
@@ -207,27 +209,29 @@ int main (int argc, char *argv[]) {
         ofname[i] = malloc(sizeof(char) * 1000);
     }
     
-    sprintf(cmd[0], "ls %s/pmapoutfile.*", workdir);
-    fp = popen(cmd[0], "r" );                
-    while ( fgets(fname, sizeof(fname), fp) != NULL ) {
-        ptr = strchr(fname, '\n');
-        *ptr = '\0'; //replace newline
-        ptr = strrchr(fname, '/');
-        ptr++;       //start of prefix
+    if (!dry) {
+        sprintf(cmd[0], "ls %s/pmapoutfile.*", workdir);
+        fp = popen(cmd[0], "r" );
+        while ( fgets(fname, sizeof(fname), fp) != NULL ) {
+            ptr = strchr(fname, '\n');
+            *ptr = '\0'; //replace newline
+            ptr = strrchr(fname, '/');
+            ptr++;       //start of prefix
 
-        sprintf(cmd[0], "cat ");                
-        for (i=0; i<nProc; i++) {
-            sprintf(ifname[i], "%s/%s", workdir, ptr);
-            sprintf(ofname[i], "%s/%s.%d", mainworkdir, ptr, i);
-            proclist[i] = i;
-            sprintf(cmd[0], "%s %s", cmd[0], ofname[i]);
+            sprintf(cmd[0], "cat ");                
+            for (i=0; i<nProc; i++) {
+                sprintf(ifname[i], "%s/%s", workdir, ptr);
+                sprintf(ofname[i], "%s/%s.%d", mainworkdir, ptr, i);
+                proclist[i] = i;
+                sprintf(cmd[0], "%s %s", cmd[0], ofname[i]);
+            }
+            Gather_Files(nProc, proclist, ifname, ofname, 0, myProc, MPI_TAG, comm);
+            sprintf(cmd[0], "%s > %s/%s", cmd[0], outdir, ptr+12); // Ignore "pmapoutfile." prefix
+            if (myProc == 0)
+                system(cmd[0]);
         }
-        Gather_Files(nProc, proclist, ifname, ofname, 0, myProc, MPI_TAG, comm);
-        sprintf(cmd[0], "%s > %s/%s", cmd[0], outdir, ptr+12); // Ignore "pmapoutfile." prefix
-        if (myProc == 0)
-            system(cmd[0]);
+        pclose(fp);
     }
-    pclose(fp);
 
     /* Remove all temporary files */
     if (cleanup) { 
