@@ -159,20 +159,20 @@ int main (int argc, char *argv[]) {
         if (paired_end) { 
             sprintf(cmd[ncmd++], "bwa aln %s %s/%s %s/pmap.reads > %s/pmap.out.sai", progargs, indexdir, indexprefix, workdir, workdir);
             sprintf(cmd[ncmd++], "bwa aln %s %s/%s %s/pmap.reads2 > %s/pmap.out2.sai", progargs, indexdir, indexprefix, workdir, workdir);            
-            sprintf(cmd[ncmd++], "bwa sampe %s %s/%s %s/pmap.out.sai %s/pmap.out2.sai %s/pmap.reads %s/pmap.reads2 > %s/pmapoutfile.out.txt", convargs, indexdir, indexprefix, workdir, workdir, workdir, workdir, workdir);
+            sprintf(cmd[ncmd++], "bwa sampe %s %s/%s %s/pmap.out.sai %s/pmap.out2.sai %s/pmap.reads %s/pmap.reads2 > %s", convargs, indexdir, indexprefix, workdir, workdir, workdir, workdir, outfile);
 	} else {          
             sprintf(cmd[ncmd++], "bwa aln %s %s/%s %s/pmap.reads > %s/pmap.out.sai", progargs, indexdir, indexprefix, workdir, workdir);
-            sprintf(cmd[ncmd++], "bwa samse %s %s/%s %s/pmap.out.sai %s/pmap.reads > %s/pmapoutfile.out.txt", convargs, indexdir, indexprefix, workdir, workdir, workdir);
+            sprintf(cmd[ncmd++], "bwa samse %s %s/%s %s/pmap.out.sai %s/pmap.reads > %s", convargs, indexdir, indexprefix, workdir, workdir, outfile);
         }
     } else if (program == SOAP) {
         if (paired_end)   
-            sprintf(cmd[ncmd++], "soap -D %s/%s -a %s/pmap.reads -b %s/pmap.reads2 -o %s/pmapoutfile.out.txt %s", indexdir, indexprefix, workdir, workdir, workdir, progargs);
+            sprintf(cmd[ncmd++], "soap -D %s/%s -a %s/pmap.reads -b %s/pmap.reads2 -o %s %s", indexdir, indexprefix, workdir, workdir, outfile, progargs);
         else              
-            sprintf(cmd[ncmd++], "soap -D %s/%s -a %s/pmap.reads -o %s/pmapoutfile.out.txt %s", indexdir, indexprefix, workdir, workdir, progargs);        
+            sprintf(cmd[ncmd++], "soap -D %s/%s -a %s/pmap.reads -o %s %s", indexdir, indexprefix, workdir, outfile, progargs);        
     } else if (program == GSNAP) { /* Single file and the same call for paired end and single end reads */
         ptr = strrchr(indexdir, '/'); /* Remove the directory name, that is the same as the indexprefix */
         ptr = '\0';
-        sprintf(cmd[ncmd++], "gsnap %s -D %s -d %s %s/pmap.reads > %s/pmapoutfile.out.txt", progargs, indexdir, indexprefix, workdir, workdir);
+        sprintf(cmd[ncmd++], "gsnap %s -D %s -d %s %s/pmap.reads > %s", progargs, indexdir, indexprefix, workdir, outfile);
     } else if (program == MAQ) {
         sprintf(cmd[ncmd++], "maq fasta2bfa %s/%s %s/index/index.bfa", indexdir, indexprefix, workdir); /* Genome conversion */
         sprintf(indexdir, "%s/index", workdir); /* In case the genome (current value of indexdir) is at a shared location */
@@ -181,17 +181,17 @@ int main (int argc, char *argv[]) {
             sprintf(cmd[ncmd++], "maq fastq2bfq %s/pmap.reads %s/pmap.reads.bfq", workdir, workdir);
             sprintf(cmd[ncmd++], "maq fastq2bfq %s/pmap.reads2 %s/pmap.reads2.bfq", workdir, workdir);
             sprintf(cmd[ncmd++], "maq map %s %s/pmap.map %s/%s %s/pmap.reads.bfq %s/pmap.reads2.bfq", progargs, workdir, indexdir, indexprefix, workdir, workdir);
-            sprintf(cmd[ncmd++], "maq mapview %s %s/pmap.map > %s/pmapoutfile.out.txt", convargs, workdir, workdir);
+            sprintf(cmd[ncmd++], "maq mapview %s %s/pmap.map > %s", convargs, workdir, outfile);
         } else {               
             sprintf(cmd[ncmd++], "maq fastq2bfq %s/pmap.reads %s/pmap.reads.bfq", workdir, workdir);
             sprintf(cmd[ncmd++], "maq map %s %s/pmap.map %s/%s %s/pmap.reads.bfq", progargs, workdir, indexdir, indexprefix, workdir);
-            sprintf(cmd[ncmd++], "maq mapview %s %s/pmap.map > %s/pmapoutfile.out.txt", convargs, workdir, workdir);
+            sprintf(cmd[ncmd++], "maq mapview %s %s/pmap.map > %s", convargs, workdir, outfile);
         }
     } else if (program == RMAP) {
         if (paired_end)        
-            sprintf(cmd[ncmd++], "rmappe %s -c %s/%s -o %s/pmapoutfile.out.txt -Q %s/pmap.reads", progargs, indexdir, indexprefix, workdir, workdir);
+            sprintf(cmd[ncmd++], "rmappe %s -c %s/%s -o %s -Q %s/pmap.reads", progargs, indexdir, indexprefix, outfile, workdir);
         else                   
-            sprintf(cmd[ncmd++], "rmap %s -c %s/%s -o %s/pmapoutfile.out.txt -Q %s/pmap.reads", progargs, indexdir, indexprefix, workdir, workdir);
+            sprintf(cmd[ncmd++], "rmap %s -c %s/%s -o %s -Q %s/pmap.reads", progargs, indexdir, indexprefix, outfile, workdir);
     }
 
     /* Execute the commands */
