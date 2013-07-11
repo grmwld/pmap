@@ -40,7 +40,7 @@
 /*### MAIN ########################################################################*/    
 int main (int argc, char *argv[]) {
     int i, ncmd;
-    char progargs[1000], workdir[1000], outfile[50]="pmapoutfile.out.txt", *mainworkdir, *outdir, indexprefix[1000]="index", indexdir[1000]="", convargs[1000];
+    char progargs[1000], workdir[1000], outfile[1000]="", *mainworkdir, *outdir, indexprefix[1000]="index", indexdir[1000]="", convargs[1000];
     char cmd[10][1000], usage[1000], fname[1000];
     int cleanup=1, paired_end=0, shared_index=0, dry=0;
     FILE *pfp, *fp;
@@ -85,6 +85,12 @@ int main (int argc, char *argv[]) {
         fprintf(stderr, "[Node %d] pmap error: Cannot find local workdir: %s\n", myProc, workdir);
         exit(-1);
     }    
+    if (dry) {
+        strcpy(outfile, "/dev/null");
+    }
+    else {
+        sprintf(outfile, "%s/%s", workdir, "pmapoutfile.out.txt");
+    }
     if (!strcmp(indexdir, "")) {
         sprintf(indexdir, "%s/index", workdir);
         strcpy(indexprefix, "index");
@@ -146,9 +152,9 @@ int main (int argc, char *argv[]) {
     ncmd = 0;
     if (program == BOWTIE) {
         if (paired_end)   
-            sprintf(cmd[ncmd++], "bowtie %s %s/%s -1 %s/pmap.reads -2 %s/pmap.reads2 %s/%s", progargs, indexdir, indexprefix, workdir, workdir, workdir, outfile);
+            sprintf(cmd[ncmd++], "bowtie %s %s/%s -1 %s/pmap.reads -2 %s/pmap.reads2 %s", progargs, indexdir, indexprefix, workdir, workdir, outfile);
         else              
-            sprintf(cmd[ncmd++], "bowtie %s %s/%s %s/pmap.reads %s/%s", progargs, indexdir, indexprefix, workdir, workdir, outfile);
+            sprintf(cmd[ncmd++], "bowtie %s %s/%s %s/pmap.reads %s", progargs, indexdir, indexprefix, workdir, outfile);
     } else if (program == BWA) {
         if (paired_end) { 
             sprintf(cmd[ncmd++], "bwa aln %s %s/%s %s/pmap.reads > %s/pmap.out.sai", progargs, indexdir, indexprefix, workdir, workdir);
